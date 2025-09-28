@@ -1,0 +1,103 @@
+generator client {
+    provider     = "prisma-client-py"
+    output       = "../src/prisma_client"
+    interface    = "asyncio"
+}
+
+datasource db{
+    provider = "postgresql"
+    url      =  env("POSTGRESURL")
+}
+
+model Institute {
+  institute_id          String   @id @default(uuid())
+  name        String   @unique
+  type        String   // "engineering", "medical", "arts", etc.
+  address     String 
+  phone       String
+  email       String @unique
+  password    String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  students    Student[]
+  teachers    Teacher[]
+  subjects    Subject[]
+  classrooms  Classroom[]
+
+  @@map("institutes")
+}
+
+model Student {
+  s_id     String  @id  @default(uuid())
+  institute_id  String
+  student_id    String
+  email       String  @unique
+  password    String
+  name        String @default("__")
+  phone       String @default("__")
+  branch      String @default("__")
+  semester    Int @default(0)
+
+  institute    Institute @relation(fields: [institute_id], references: [institute_id], onDelete: Cascade)
+
+  @@unique([institute_id, student_id])
+  @@index([institute_id])
+  @@map("students")
+}
+
+model Teacher {
+  p_id         String   @id @default(uuid())
+  institute_id String   
+  teacher_id   String   
+  name         String @default("__")
+  email        String
+  password     String
+  phone        String @default("__")
+  department   String @default("__")
+  subject      String @default("__")
+  
+  institute    Institute @relation(fields: [institute_id], references: [institute_id], onDelete: Cascade)
+
+  @@unique([institute_id, teacher_id])
+  @@index([institute_id])
+  @@map("proffesors")
+}
+
+model Subject {
+  id           String   @id @default(uuid())
+  institute_id String   
+  subject_code String   
+  name         String
+  credits      Int 
+  semester     Int
+  branch       String
+  type         String 
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  institute    Institute @relation(fields: [institute_id], references: [institute_id], onDelete: Cascade)
+
+  @@unique([institute_id, subject_code])
+  @@index([institute_id])
+  @@map("subjects")
+}
+
+model Classroom {
+  id           String   @id @default(uuid())
+  institute_id String   
+  room_id      String   // Institute-specific room number-Dept. building
+  capacity     Int
+  type         String  
+  building     String
+  floor        Int
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  institute    Institute @relation(fields: [institute_id], references: [institute_id], onDelete: Cascade)
+
+  @@unique([institute_id, room_id, building])
+  @@index([institute_id])
+  @@map("classrooms")
+}
+

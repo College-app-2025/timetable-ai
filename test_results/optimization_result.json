@@ -1,0 +1,19 @@
+{
+  "success": true,
+  "assignments": [],
+  "student_satisfaction": 0.0,
+  "faculty_workload_balance": 1.0,
+  "room_utilization": 0.0,
+  "elective_allocation_rate": 0.0,
+  "constraint_violations": 0,
+  "optimization_time": 0.03057241439819336,
+  "schedule": {
+    "id": "schedule_test_institute_001_1_20250927_145819",
+    "institute_id": "test_institute_001",
+    "semester": 1,
+    "assignments": [],
+    "created_at": "2025-09-27T14:58:19.214090",
+    "is_optimized": true,
+    "optimization_score": 0.0
+  }
+}

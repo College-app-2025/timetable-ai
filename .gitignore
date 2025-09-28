@@ -1,0 +1,24 @@
+@'
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.Python
+venv/
+.env
+
+# Database
+*.db
+*.sqlite3
+
+# Prisma generated files
+src/prisma_client/
+node_modules/
+
+# IDE files
+.vscode/
+.idea/
+
+# Logs
+*.log
+'@ | Out-File -FilePath .gitignore -Encoding utf8

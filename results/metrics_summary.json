@@ -1,0 +1,14 @@
+{
+  "total_students": 100,
+  "first_choice_count": 0,
+  "second_choice_count": 0,
+  "third_choice_count": 0,
+  "unassigned_count": 100,
+  "interdisciplinary_count": 0,
+  "avg_satisfaction_score": 0.0,
+  "fairness_index": 1.0,
+  "section_fill_rate": 0,
+  "assignment_rate": 0.0,
+  "first_choice_percentage": 0.0,
+  "nep_compliance_rate": 0.0
+}
