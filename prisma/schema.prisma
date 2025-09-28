@@ -101,3 +101,74 @@ model Classroom {
   @@map("classrooms")
 }
 
+/// Timetable/Scheduling models
+
+model Schedule {
+  id                 String   @id @default(uuid())
+  institute_id       String
+  semester           Int
+  is_optimized       Boolean  @default(true)
+  optimization_score Float    @default(0)
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
+
+  institute Institute @relation(fields: [institute_id], references: [institute_id], onDelete: Cascade)
+  assignments Assignment[]
+  student_allocations StudentElectiveAllocation[]
+
+  @@index([institute_id, semester])
+  @@map("schedules")
+}
+
+model TimeSlot {
+  id         String   @id @default(uuid())
+  institute_id String
+  day        Int
+  period     Int
+  start_time DateTime
+  end_time   DateTime
+
+  @@index([institute_id, day, period])
+  @@map("time_slots")
+}
+
+model Assignment {
+  id            String   @id @default(uuid())
+  schedule_id   String
+  course_id     String
+  faculty_id    String
+  room_id       String
+  time_slot_id  String
+  section_id    String
+  student_count Int      @default(0)
+  is_elective   Boolean  @default(false)
+  priority_score Float   @default(0)
+  created_at    DateTime @default(now())
+
+  schedule Schedule @relation(fields: [schedule_id], references: [id], onDelete: Cascade)
+
+  @@index([schedule_id])
+  @@index([course_id])
+  @@index([faculty_id])
+  @@index([room_id])
+  @@map("assignments")
+}
+
+model StudentElectiveAllocation {
+  id               String   @id @default(uuid())
+  institute_id     String
+  schedule_id      String
+  student_id       String
+  course_id        String
+  preference_rank  Int
+  satisfaction     Float    @default(0)
+  created_at       DateTime @default(now())
+
+  schedule Schedule @relation(fields: [schedule_id], references: [id], onDelete: Cascade)
+
+  @@index([institute_id])
+  @@index([schedule_id])
+  @@index([student_id])
+  @@map("student_elective_allocations")
+}
+
