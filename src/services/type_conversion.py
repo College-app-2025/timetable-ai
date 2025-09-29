@@ -9,9 +9,7 @@ import os
 from datetime import datetime
 import sys
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from utils.logger_config import get_logger
+from src.utils.logger_config import get_logger
 
 logger = get_logger("file_conversion")
 

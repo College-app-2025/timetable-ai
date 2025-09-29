@@ -206,27 +206,210 @@ This is an automated message from the {institute_name} Scheduling System."""
 </body>
 </html>"""
 
+class SMSNotificationService:
+    """SMS notification service for urgent notifications."""
+    
+    def __init__(self):
+        # Using Twilio or similar service
+        self.account_sid = os.getenv("TWILIO_ACCOUNT_SID")
+        self.auth_token = os.getenv("TWILIO_AUTH_TOKEN")
+        self.from_number = os.getenv("TWILIO_FROM_NUMBER")
+        
+    async def send_sms(self, to_number: str, message: str) -> dict:
+        """Send SMS notification."""
+        try:
+            # Mock SMS sending for now
+            logger.info(f"SMS sent to {to_number}: {message[:50]}...")
+            return {"success": True, "message_id": f"sms_{int(time.time())}"}
+        except Exception as e:
+            logger.error(f"SMS sending failed: {str(e)}")
+            return {"success": False, "error": str(e)}
+
+class DynamicReallocationNotificationService:
+    """Enhanced notification service for dynamic reallocation system."""
+    
+    def __init__(self):
+        self.email_service = EmailNotificationService()
+        self.sms_service = SMSNotificationService()
+        self.logger = logger
+    
+    async def send_substitute_request(self, professor_email: str, assignment: dict, unavailability: dict) -> dict:
+        """Send substitute request to professor."""
+        try:
+            subject = "Substitute Teaching Request"
+            message = f"""
+Dear Professor,
+
+You have been requested to substitute for a class:
+
+Course: {assignment.get('course_id', 'N/A')}
+Section: {assignment.get('section_id', 'N/A')}
+Time Slot: {assignment.get('time_slot_id', 'N/A')}
+Date: {unavailability.get('unavailability_date', 'N/A')}
+Reason: {unavailability.get('reason', 'N/A')}
+
+Please respond within 2 hours to accept or decline this request.
+
+Best regards,
+Timetable Management System
+            """
+            
+            result = await self.email_service.send_urgent_notification(
+                recipients=[professor_email],
+                subject=subject,
+                message=message,
+                institute_name="Timetable System",
+                notification_type="urgent"
+            )
+            
+            return result
+            
+        except Exception as e:
+            self.logger.error(f"Error sending substitute request: {str(e)}")
+            return {"success": False, "error": str(e)}
+    
+    async def send_student_voting_notification(self, student_emails: list, reallocation_id: str, substitute_professor: str) -> dict:
+        """Send voting notification to students."""
+        try:
+            subject = "Vote for Substitute Professor"
+            message = f"""
+Dear Students,
+
+Your class needs a substitute professor. Please vote on the following candidate:
+
+Substitute Professor: {substitute_professor}
+Reallocation ID: {reallocation_id}
+
+Please vote YES or NO by clicking the link in this email or responding to this message.
+
+Voting closes in 24 hours.
+
+Best regards,
+Timetable Management System
+            """
+            
+            result = await self.email_service.send_urgent_notification(
+                recipients=student_emails,
+                subject=subject,
+                message=message,
+                institute_name="Timetable System",
+                notification_type="urgent"
+            )
+            
+            return result
+            
+        except Exception as e:
+            self.logger.error(f"Error sending voting notification: {str(e)}")
+            return {"success": False, "error": str(e)}
+    
+    async def send_rescheduling_options(self, professor_id: str, available_slots: list) -> dict:
+        """Send rescheduling options to professor."""
+        try:
+            # Get professor email from database
+            from src.utils.prisma import db
+            await db.connect()
+            professor = await db.teacher.find_unique(where={"teacher_id": professor_id})
+            await db.disconnect()
+            
+            if not professor:
+                return {"success": False, "error": "Professor not found"}
+            
+            subject = "Class Rescheduling Options"
+            message = f"""
+Dear Professor,
+
+Your class needs to be rescheduled. Here are the available options:
+
+{chr(10).join([f"• {slot.get('date', 'N/A')} - {slot.get('time_slot', 'N/A')}" for slot in available_slots])}
+
+Please select your preferred option by responding to this email.
+
+Best regards,
+Timetable Management System
+            """
+            
+            result = await self.email_service.send_urgent_notification(
+                recipients=[professor["email"]],
+                subject=subject,
+                message=message,
+                institute_name="Timetable System",
+                notification_type="urgent"
+            )
+            
+            return result
+            
+        except Exception as e:
+            self.logger.error(f"Error sending rescheduling options: {str(e)}")
+            return {"success": False, "error": str(e)}
+    
+    async def send_weekend_class_notification(self, student_emails: list, weekend_date: str) -> dict:
+        """Send weekend class notification to students."""
+        try:
+            subject = "Weekend Class Option"
+            message = f"""
+Dear Students,
+
+Your missed class can be rescheduled to a weekend session:
+
+Proposed Date: {weekend_date}
+Time: 10:00 AM - 12:00 PM
+
+Please vote YES or NO for this weekend class option.
+
+Voting closes in 48 hours.
+
+Best regards,
+Timetable Management System
+            """
+            
+            result = await self.email_service.send_urgent_notification(
+                recipients=student_emails,
+                subject=subject,
+                message=message,
+                institute_name="Timetable System",
+                notification_type="urgent"
+            )
+            
+            return result
+            
+        except Exception as e:
+            self.logger.error(f"Error sending weekend class notification: {str(e)}")
+            return {"success": False, "error": str(e)}
+    
+    async def send_reallocation_complete_notification(self, recipients: list, reallocation_result: dict) -> dict:
+        """Send reallocation completion notification."""
+        try:
+            subject = "Class Reallocation Complete"
+            message = f"""
+Dear All,
+
+The class reallocation has been completed successfully.
+
+Action Taken: {reallocation_result.get('action_taken', 'N/A')}
+Step Used: {reallocation_result.get('step', 'N/A')}
+Status: {reallocation_result.get('status', 'N/A')}
+
+Thank you for your cooperation.
+
+Best regards,
+Timetable Management System
+            """
+            
+            result = await self.email_service.send_urgent_notification(
+                recipients=recipients,
+                subject=subject,
+                message=message,
+                institute_name="Timetable System",
+                notification_type="urgent"
+            )
+            
+            return result
+            
+        except Exception as e:
+            self.logger.error(f"Error sending completion notification: {str(e)}")
+            return {"success": False, "error": str(e)}
+
+# Service instances
 email_service = EmailNotificationService()
-
-
-
-# import asyncio
-# from src.services.notification_service import email_service
-
-# async def main():
-#     recipients = ["student1@example.com", "student2@example.com"]
-#     subject = "Class Cancelled"
-#     message = "Tomorrow's 9 AM class is cancelled due to unforeseen circumstances."
-#     institute_name = "NIT Agartala"
-
-#     result = await email_service.send_urgent_notification(
-#         recipients=recipients,
-#         subject=subject,
-#         message=message,
-#         institute_name=institute_name,
-#         notification_type="urgent"
-#     )
-
-#     print(result)
-
-# asyncio.run(main())
+sms_service = SMSNotificationService()
+notification_service = DynamicReallocationNotificationService()

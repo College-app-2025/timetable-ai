@@ -11,6 +11,11 @@ def check_ai_system():
     print("🔍 CHECKING AI SYSTEM COMPONENTS")
     print("=" * 40)
     
+    # Add project root to path
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    sys.path.insert(0, project_root)
+    os.chdir(project_root)
+    
     # Check if src directory exists
     if not os.path.exists("src"):
         print("❌ src directory not found")

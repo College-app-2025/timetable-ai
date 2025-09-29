@@ -172,3 +172,78 @@ model StudentElectiveAllocation {
   @@map("student_elective_allocations")
 }
 
+/// Dynamic Reallocation Models
+   
+
+model ProfessorUnavailability {
+  id               String   @id @default(uuid())
+  institute_id     String
+  professor_id     String
+  assignment_id    String
+  unavailability_date DateTime
+  reason           String
+  status           String  @default("pending") // pending, approved, rejected
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  assignment       Assignment @relation(fields: [assignment_id], references: [id], onDelete: Cascade)
+  reallocations    ReallocationLog[]
+
+  @@index([institute_id])
+  @@index([professor_id])
+  @@index([assignment_id])
+  @@map("professor_unavailability")
+}
+
+model ReallocationLog {
+  id                    String   @id @default(uuid())
+  unavailability_id     String
+  step                  Int      // 1-5 (which step was used)
+  action_taken          String   // substitute_assigned, rescheduled, weekend_class, dropped
+  substitute_professor_id String?
+  original_assignment_id String
+  new_assignment_id     String?
+  student_votes         Json?    // {"yes": 15, "no": 5, "total": 20}
+  professor_approval     Boolean?
+  rescheduled_date      DateTime?
+  status                String   @default("pending")
+  created_at            DateTime @default(now())
+  updated_at            DateTime @updatedAt
+
+  unavailability ProfessorUnavailability @relation(fields: [unavailability_id], references: [id], onDelete: Cascade)
+
+  @@index([unavailability_id])
+  @@index([step])
+  @@map("reallocation_logs")
+}
+
+model ProfessorAvailability {
+  id               String   @id @default(uuid())
+  institute_id     String
+  professor_id     String
+  date             DateTime
+  time_slot_id     String
+  is_available     Boolean  @default(true)
+  reason           String?
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  @@unique([professor_id, date, time_slot_id])
+  @@index([institute_id])
+  @@index([professor_id])
+  @@map("professor_availability")
+}
+
+model StudentVote {
+  id               String   @id @default(uuid())
+  reallocation_id  String
+  student_id       String
+  vote             Boolean  // true = yes, false = no
+  created_at       DateTime @default(now())
+
+  @@unique([reallocation_id, student_id])
+  @@index([reallocation_id])
+  @@index([student_id])
+  @@map("student_votes")
+}
+

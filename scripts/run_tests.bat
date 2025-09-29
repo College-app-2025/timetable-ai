@@ -17,7 +17,7 @@ echo ✅ Python found! Running tests...
 echo.
 
 echo 📊 Creating sample database and preference tables...
-python quick_test.py
+python ../tests/test_quick_system_check.py
 
 echo.
 echo 🎯 Test completed! Check the generated files:

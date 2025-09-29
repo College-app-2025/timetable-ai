@@ -14,8 +14,8 @@ import sys
 from datetime import datetime
 from typing import Dict, List, Any
 
-# Add the src directory to the path
-sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
+# Add the project root to the path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 def check_system_health():
     """Check if the AI system is properly set up."""

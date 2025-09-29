@@ -6,13 +6,15 @@ from fastapi import HTTPException
 from typing import Optional, Dict, Any
 import secrets
 from src.utils.logger_config import get_logger
+import os
 
 logger = get_logger("token_service")
 
 class TokenService:
     def __init__(self):
         # Security recommendations from research
-        self.SECRET_KEY = "Pappu_@_12340"  # TODO: Use environment variable
+        # Read from environment; fallback kept only for local dev
+        self.SECRET_KEY = os.getenv("JWT_SECRET", "Pappu_@_12340")
         self.ALGORITHM = "HS256"
         
         # Token expiry times based on best practices

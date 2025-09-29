@@ -7,6 +7,10 @@ import pandas as pd
 from typing import List, Dict, Any, Tuple
 from datetime import datetime, time
 import asyncio
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from src.ml.core.optimizer import TimetableOptimizer
 from src.ml.data.models import OptimizationConfig
 from src.ml.data.loaders import load_institute_data

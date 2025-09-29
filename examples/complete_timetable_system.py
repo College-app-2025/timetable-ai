@@ -5,10 +5,14 @@ Shows how to input data from database and get formatted schedule output.
 
 import asyncio
 import pandas as pd
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from src.ml.core.optimizer import TimetableOptimizer
 from src.ml.data.models import OptimizationConfig
 from src.ml.data.loaders import load_institute_data
-from schedule_output_formatter import ScheduleOutputFormatter
+from examples.schedule_output_formatter import ScheduleOutputFormatter
 from src.utils.prisma import db
 
 class CompleteTimetableSystem:

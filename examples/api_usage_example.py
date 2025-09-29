@@ -4,9 +4,13 @@ API usage example showing exact input/output formats for the timetable system.
 
 import asyncio
 import json
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from src.ml.core.optimizer import TimetableOptimizer
 from src.ml.data.models import OptimizationConfig
-from schedule_output_formatter import ScheduleOutputFormatter
+from examples.schedule_output_formatter import ScheduleOutputFormatter
 
 async def demonstrate_api_usage():
     """Demonstrate the exact API input/output format."""
